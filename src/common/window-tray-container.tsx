@@ -1,6 +1,5 @@
 import React from 'react'
-import { Box, Typography } from '@mui/material'
-import { styled } from '@mui/system'
+import { Box, styled, Typography } from '@mui/material'
 
 const TrayContainer = styled(Box)`
   display: flex;
@@ -20,32 +19,56 @@ const Time = styled(Typography)`
 `
 
 export default function WindowTrayContainer() {
-  const [time, setTime] = React.useState(new Date())
+  const [hour, setHour] = React.useState<string>('')
+  const [minute, setMinute] = React.useState<string>('')
+  const [ampm, setAmpm] = React.useState<string>('')
 
   React.useEffect(() => {
+    const date = new Date()
+    setHour(
+      date.getHours().toString().length === 1
+        ? '0' + date.getHours().toString()
+        : date.getHours().toString()
+    )
+    setMinute(
+      date.getMinutes().toString().length === 1
+        ? '0' + date.getMinutes().toString()
+        : date.getMinutes().toString()
+    )
+    setAmpm(date.getHours() >= 12 ? 'PM' : 'AM')
+
     const interval = setInterval(() => {
-      setTime(new Date())
+      setHour(
+        new Date().getHours().toString().length === 1
+          ? '0' + new Date().getHours().toString()
+          : new Date().getHours().toString()
+      )
+      setMinute(
+        new Date().getMinutes().toString().length === 1
+          ? '0' + new Date().getMinutes().toString()
+          : new Date().getMinutes().toString()
+      )
+      setAmpm(new Date().getHours() >= 12 ? 'PM' : 'AM')
     }, 60000) // 1 minute interval
 
-    return () => clearInterval(interval)
+    console.log('interval set')
+
+    return () => {
+      clearInterval(interval)
+      console.log('interval cleared')
+      setHour('')
+      setMinute('')
+      setAmpm('')
+    }
   }, [])
-
-  const formatTime = (date: Date) => {
-    let hours = date.getHours()
-    const minutes = date.getMinutes()
-    const ampm = hours >= 12 ? 'PM' : 'AM'
-    hours = hours % 12
-    hours = hours ? hours : 12 // the hour '0' should be '12'
-    const minutesStr = minutes < 10 ? '0' + minutes : minutes
-
-    return `${hours}:${minutesStr} ${ampm}`
-  }
 
   return (
     <TrayContainer>
       <Time variant='body1' sx={{ userSelect: 'none' }}>
-        {formatTime(time)}
+        {hour}:{minute} {ampm}
       </Time>
     </TrayContainer>
   )
 }
+
+React.memo(WindowTrayContainer)

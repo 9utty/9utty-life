@@ -18,7 +18,6 @@
     "jsx": "preserve",
     "incremental": true,
   },
-  "include": ["src", "declaration.d.ts", "public"],
+  "include": ["src", "declaration.d.ts", "public", "auth.ts"],
   "exclude": ["node_modules"]
-  
 }

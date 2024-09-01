@@ -1,13 +1,22 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /** @format */
 
 import React from 'react'
-import { Dialog, DialogTitle, DialogActions, Button, Box } from '@mui/material'
+import {
+  Dialog,
+  DialogTitle,
+  DialogActions,
+  Button,
+  Box,
+  Typography
+} from '@mui/material'
 import { styled } from '@mui/system'
 import Draggable from 'react-draggable'
 import { ResizableBox } from 'react-resizable'
 import 'react-resizable/css/styles.css'
 import { MainMenu } from 'src/components/main-menu'
 import { useRouter } from 'next/router'
+import Image from 'next/image'
 
 const StyledDialog = styled(Dialog)`
   .MuiPaper-root {
@@ -88,7 +97,24 @@ export default function WindowDialog({
   return (
     <React.Fragment>
       <Button onClick={() => handleOpen(dialog.main)}>
-        {dialog.main.name}
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center'
+          }}
+        >
+          <Image
+            src={'/directory_open_cool-0.png'}
+            alt={dialog.main.name}
+            width={70}
+            height={70}
+            priority={true}
+          ></Image>
+          <Typography variant='body1' color='white'>
+            {dialog.main.name}
+          </Typography>
+        </Box>
       </Button>
       {dialog.open && (
         <Draggable

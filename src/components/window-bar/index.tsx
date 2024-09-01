@@ -73,8 +73,8 @@ export default function WindowBar() {
             Start
           </Typography>
         </WindowButton>
-        <WindowTrayContainer />
         <WindowMenuBar open={open} onClose={handleClose} menuChildren={<></>} />
+        <WindowTrayContainer />
       </Box>
     </Box>
   )

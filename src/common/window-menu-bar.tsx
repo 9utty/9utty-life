@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/** @format */
+
 import React from 'react'
 import { Box, Typography } from '@mui/material'
 
@@ -19,7 +22,8 @@ export default function WindowMenuBar({ open, onClose, menuChildren }: Props) {
         minWidth: '200px',
         backgroundColor: 'rgb(198, 198, 198)',
         border: '2px solid #fff',
-        borderColor: 'rgb(254, 254, 254) rgb(132, 133, 132) rgb(132, 133, 132) rgb(254, 254, 254)',
+        borderColor:
+          'rgb(254, 254, 254) rgb(132, 133, 132) rgb(132, 133, 132) rgb(254, 254, 254)',
         zIndex: 1001,
         padding: '10px'
       }}

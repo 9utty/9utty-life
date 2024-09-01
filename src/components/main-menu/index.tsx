@@ -1,5 +1,6 @@
 /** @format */
 
+import { CardContent } from '@mui/material'
 import { useRouter } from 'next/router'
 import React from 'react'
 import WindowDialog from 'src/common/window-dialog'
@@ -45,7 +46,10 @@ const randomPosition = () => `${10 + Math.random() * 35}%`
 
 export const MemoMainMenus = React.memo(MainMenus)
 
-export default function MainMenus() {
+type Props = {
+  children: React.ReactNode
+}
+export default function MainMenus({ children }: Props) {
   const [dialogs, setDialogs] = React.useState<DialogState[]>([])
 
   const route = useRouter()
@@ -186,7 +190,6 @@ export default function MainMenus() {
         const newDialogs = [...filterDialogs, find]
         setDialogs(newDialogs)
       }
-      console.log(find)
     },
     [dialogs]
   )
@@ -196,7 +199,12 @@ export default function MainMenus() {
       const baseUrl = process.env.NEXT_PUBLIC_API_URL
         ? process.env.NEXT_PUBLIC_API_URL
         : 'http://localhost:3000'
-      const response = await fetch(`${baseUrl}/api/mainList`)
+      console.log('getMenu')
+      const response = await fetch(`${baseUrl}/api/mainList`, {
+        next: {
+          revalidate: 600
+        }
+      })
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
@@ -222,28 +230,27 @@ export default function MainMenus() {
   }, [])
 
   return (
-    <React.Fragment>
-      {dialogs.length === 0 ? null : (
-        <React.Fragment>
-          {dialogs.map(dialog => {
-            return (
-              <WindowDialog
-                key={dialog.main.name}
-                dialog={dialog}
-                handleOpen={handleOpen}
-                handleFocus={handleFocus}
-                handleResize={handleResize}
-                handleBlur={handleBlur}
-                onClose={onClose}
-                handleResizeStart={handleResizeStart}
-                handleResizeStop={handleResizeStop}
-                handleDragStart={handleDragStart}
-                handleDragStop={handleDragStop}
-              />
-            )
-          })}
-        </React.Fragment>
-      )}
-    </React.Fragment>
+    <CardContent
+      sx={{ width: '100vw', display: 'flex', justifyContent: 'start', gap: 4 }}
+    >
+      {dialogs.map(dialog => {
+        return (
+          <WindowDialog
+            key={dialog.main.name}
+            dialog={dialog}
+            handleOpen={handleOpen}
+            handleFocus={handleFocus}
+            handleResize={handleResize}
+            handleBlur={handleBlur}
+            onClose={onClose}
+            handleResizeStart={handleResizeStart}
+            handleResizeStop={handleResizeStop}
+            handleDragStart={handleDragStart}
+            handleDragStop={handleDragStop}
+          />
+        )
+      })}
+      {children}
+    </CardContent>
   )
 }
