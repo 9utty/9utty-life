@@ -1,30 +1,28 @@
 /** @format */
 
 import { Box, CardContent, Typography } from '@mui/material'
+import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 
-type Menu = {
+const WindowDialog = dynamic(() => import('src/common/windowDialog'), {
+  ssr: false
+})
+
+export type Menu = {
   name: string
   img: string
   path: string
 }
 
-const MENUS: Menu[] = [
-  {
-    name: '포스트',
-    img: '/directory_open_file_mydocs-0.png',
-    path: '/post'
-  },
-  {
+export default function MenesComponent() {
+  const menus = React.useRef<Menu>({
     name: '방명록',
     img: '/write_yellow-1.png',
     path: '/guest-book'
-  }
-]
+  })
 
-export default function MenesComponent() {
   return (
     <CardContent
       sx={{
@@ -34,32 +32,31 @@ export default function MenesComponent() {
         gap: 4
       }}
     >
-      {MENUS.map((menu, index) => (
-        <Box key={index}>
-          <Link href={menu.path}>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                flexDirection: 'column',
-                gap: 1,
-                justifyContent: 'center'
-              }}
-            >
-              <Image
-                src={menu.img}
-                alt={menu.name}
-                width={70}
-                height={70}
-                priority={true}
-              />
-              <Typography variant='body1' color='white'>
-                {menu.name}
-              </Typography>
-            </Box>
-          </Link>
-        </Box>
-      ))}
+      <Box>
+        <Link href={'/post'}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              flexDirection: 'column',
+              gap: 1,
+              justifyContent: 'center'
+            }}
+          >
+            <Image
+              src={'/directory_open_file_mydocs-0.png'}
+              alt={'포스트'}
+              width={70}
+              height={70}
+              priority={true}
+            />
+            <Typography variant='body1' color='white'>
+              포스트
+            </Typography>
+          </Box>
+        </Link>
+      </Box>
+      <WindowDialog menu={menus.current} />
     </CardContent>
   )
 }

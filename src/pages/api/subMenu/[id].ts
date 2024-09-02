@@ -9,8 +9,12 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  const { id } = req.query
   try {
-    const subDataById = await client.blogSubMenu.findMany({
+    const subDataById = await client.blogSubMenu.findUnique({
+      where: {
+        id: Number(id)
+      },
       include: {
         blogItems: true
       }

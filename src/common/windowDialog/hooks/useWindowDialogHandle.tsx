@@ -1,14 +1,11 @@
 /** @format */
 
 import React from 'react'
-import { DialogFormType } from './useDialogForm'
-import { useRouter } from 'next/router'
-import stringSimilarity from 'string-similarity'
-import { Items } from 'src/pages/post/[[...slug]]'
+import { WindowDialogFormType } from './useWindowDialogForm'
 
 const randomPosition = () => `${10 + Math.random() * 35}%`
 
-export type DialogHandle = {
+export type WindowDialogHandle = {
   handleBlur: () => void
   handleClose: () => void
   handleDragStart: () => void
@@ -18,17 +15,16 @@ export type DialogHandle = {
   handleResize: ({ size }: { size: { width: number; height: number } }) => void
   handleResizeStart: () => void
   handleResizeStop: () => void
-  handleSearch: (searchText: string) => Items[]
 }
 
 type Props = {
-  form: DialogFormType
-  items: Items[]
+  form: WindowDialogFormType
 }
 
-export default function useDialogHandle({ form, items }: Props): DialogHandle {
+export default function useWindowDialogHandle({
+  form
+}: Props): WindowDialogHandle {
   const { setValue } = form
-  const router = useRouter()
 
   const handleOpen = React.useCallback(() => {
     setValue('open', true)
@@ -83,23 +79,7 @@ export default function useDialogHandle({ form, items }: Props): DialogHandle {
   const handleClose = React.useCallback(() => {
     setValue('open', false)
     setValue('isFocus', false)
-    router.push('/')
-  }, [setValue, router])
-
-  const handleSearch = React.useCallback(
-    (searchText: string): Items[] => {
-      const matches = items.filter(
-        item =>
-          stringSimilarity.compareTwoStrings(
-            item.title.toLowerCase(),
-            searchText
-          ) > 0.2
-      )
-
-      return matches
-    },
-    [items]
-  )
+  }, [setValue])
 
   return {
     handleBlur,
@@ -110,7 +90,6 @@ export default function useDialogHandle({ form, items }: Props): DialogHandle {
     handleOpen,
     handleResize,
     handleResizeStart,
-    handleResizeStop,
-    handleSearch
+    handleResizeStop
   }
 }

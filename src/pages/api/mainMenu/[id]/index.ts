@@ -9,11 +9,16 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  const { id } = req.query
+
   try {
     const mainDataById = await client.blogMainMenu.findMany({
       include: {
         subMenus: true,
         blogItems: true
+      },
+      where: {
+        id: Number(id)
       }
     })
 

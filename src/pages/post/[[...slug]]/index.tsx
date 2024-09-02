@@ -4,11 +4,9 @@ import React from 'react'
 import {
   Box,
   Button,
-  CardContent,
   Dialog,
   DialogTitle,
   styled,
-  TextField,
   Typography
 } from '@mui/material'
 import { useRouter } from 'next/router'
@@ -17,8 +15,7 @@ import { Controller, useWatch } from 'react-hook-form'
 import { ResizableBox } from 'react-resizable'
 import useDialogForm from 'src/hooks/dialog/useDialogForm'
 import useDialogHandle from 'src/hooks/dialog/useDialogHandle'
-import LeftButton from 'src/common/left-button'
-import RightButton from 'src/common/right-button'
+import { PostUrl, validationPostUrl } from 'src/utils/validationPostUrl'
 
 const StyledDialog = styled(Dialog)`
   .MuiPaper-root {
@@ -141,12 +138,57 @@ const StyledCardBox = styled(Box)`
   border-top-color: #808080;
 `
 
-export default function PostComponent() {
+export type MainMenu = {
+  id: number
+  name: string
+  createdAt: Date
+  updatedAt: Date
+  blogItems: Items[]
+  subMenus: SubMenu[]
+}
+
+export type SubMenu = {
+  id: number
+  mainMenuId: number
+  name: string
+  createdAt: Date
+  updatedAt: Date
+  blogItems: Items[]
+}
+
+export type Items = {
+  id: number
+  mainMenuId: number | null
+  subMenuId: number | null
+  title: string
+  path: string
+  viewCount: number
+  tag: string[]
+  createdAt: Date
+  updatedAt: Date
+}
+
+export default function PostComponent({
+  mainMenus,
+  items,
+  slug
+}: {
+  mainMenus: MainMenu[]
+  items: Items[]
+  slug: string[]
+}) {
+  const [postUrl, setPostUrl] = React.useState<PostUrl>({
+    mainMenu: '',
+    mainMenuId: '',
+    subMenu: '',
+    subMenuId: '',
+    item: '',
+    itemId: ''
+  })
   const draggableRef = React.useRef(null)
   const form = useDialogForm()
   const { setValue, control, watch } = form
-  const router = useRouter()
-  const handle = useDialogHandle({ form })
+  const handle = useDialogHandle({ form, items })
 
   const open = useWatch({ control, name: 'open' })
   const position = useWatch({ control, name: 'position' })
@@ -154,17 +196,13 @@ export default function PostComponent() {
   const isFocus = watch('isFocus')
 
   React.useEffect(() => {
-    console.log(open)
     handle.handleOpen()
-    const path = router
-    console.log('path', router.query)
-    if (path && typeof path === 'string') {
-      setValue('path', path)
+    const postUrl = validationPostUrl(slug)
+    if (postUrl) {
+      setPostUrl(postUrl)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-  console.log('focus', isFocus)
 
   return (
     <Draggable
@@ -275,7 +313,7 @@ export default function PostComponent() {
               >
                 <Typography
                   sx={{
-                    minWidth: 45,
+                    minWidth: 65,
                     height: 35,
                     color: '#000',
                     display: 'flex',
@@ -283,7 +321,7 @@ export default function PostComponent() {
                     justifyContent: 'center'
                   }}
                 >
-                  주소
+                  검색어
                 </Typography>
                 <Controller
                   control={control}
@@ -303,7 +341,7 @@ export default function PostComponent() {
                         }}
                         onClick={() => handle.handleSearch(field.value)}
                       >
-                        이동
+                        검색
                       </StyledButton>
                     </React.Fragment>
                   )}
@@ -323,11 +361,63 @@ export default function PostComponent() {
                 height: size.height - 110 - 45 - 5
               }}
             >
-              <StyledCardBox>hi</StyledCardBox>
+              <StyledCardBox>
+                {mainMenus.map(item => (
+                  <Box key={item.id}>
+                    <Typography>{item.name}</Typography>
+                  </Box>
+                ))}
+              </StyledCardBox>
             </Box>
           </Box>
         </ResizableBox>
       </StyledDialog>
     </Draggable>
   )
+}
+
+export async function getServerSideProps(context: any) {
+  const getAllMainMenus = async () => {
+    const baseUrl = `${process.env.MY_URL}api`
+    const res = await fetch(`${baseUrl}/allMainMenus`, {
+      next: { revalidate: 1000 }
+    })
+
+    if (!res.ok) {
+      throw new Error('Failed to fetch data')
+    }
+
+    const data = await res.json()
+    let items: Items[] = []
+    data.forEach((item: MainMenu) => {
+      console.log(item)
+      if (item.subMenus) {
+        item.subMenus.forEach(subMenu => {
+          if (subMenu.blogItems) {
+            items = [...items, ...subMenu.blogItems]
+          }
+        })
+      }
+      if (item.blogItems) {
+        items = [...items, ...item.blogItems]
+      }
+    })
+
+    return {
+      mainMenus: data,
+      items
+    }
+  }
+
+  const data = await getAllMainMenus()
+
+  const slug = context.query.slug
+
+  return {
+    props: {
+      mainMenus: data.mainMenus,
+      items: data.items,
+      slug: slug ?? []
+    }
+  }
 }
