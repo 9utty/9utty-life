@@ -171,6 +171,7 @@ export default function WindowDialogComponent({ menu }: WindowDialogProps) {
           open={open}
           fullScreen={true}
           maxWidth='lg'
+          id={`${menu.name}-dialog`}
           sx={{
             position: 'absolute',
             top: position.top,
@@ -185,9 +186,12 @@ export default function WindowDialogComponent({ menu }: WindowDialogProps) {
             }
           }}
           hideBackdrop={true}
-          onBlur={() => handle.handleBlur()}
           onClick={() => handle.handleFocus()}
-          tabIndex={-1}
+          onBlur={e => {
+            if (e.currentTarget) {
+              handle.handleBlur()
+            }
+          }}
         >
           <ResizableBox
             width={size.width}

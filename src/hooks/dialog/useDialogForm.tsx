@@ -15,6 +15,7 @@ export type DialogFormDefaultValuesType = {
   forwardHistory: string[]
   currentHistory: string
   searchText: string
+  isSearch: boolean
 }
 
 export type DialogFormType = UseFormReturn<DialogFormDefaultValuesType>
@@ -32,7 +33,8 @@ export default function useDialogForm(): DialogFormType {
       backHistory: [],
       forwardHistory: [],
       currentHistory: '',
-      searchText: ''
+      searchText: '',
+      isSearch: false
     }
   })
 

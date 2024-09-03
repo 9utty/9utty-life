@@ -4,7 +4,7 @@ import React from 'react'
 import { DialogFormType } from './useDialogForm'
 import { useRouter } from 'next/router'
 import stringSimilarity from 'string-similarity'
-import { Items } from 'src/pages/post/[[...slug]]'
+import { ItemSummary } from 'src/types'
 
 const randomPosition = () => `${10 + Math.random() * 35}%`
 
@@ -18,12 +18,12 @@ export type DialogHandle = {
   handleResize: ({ size }: { size: { width: number; height: number } }) => void
   handleResizeStart: () => void
   handleResizeStop: () => void
-  handleSearch: (searchText: string) => Items[]
+  handleSearch: (searchText: string) => ItemSummary[]
 }
 
 type Props = {
   form: DialogFormType
-  items: Items[]
+  items: ItemSummary[]
 }
 
 export default function useDialogHandle({ form, items }: Props): DialogHandle {
@@ -78,6 +78,7 @@ export default function useDialogHandle({ form, items }: Props): DialogHandle {
 
   const handleBlur = React.useCallback(() => {
     setValue('isFocus', false)
+    console.log('handleBlur')
   }, [setValue])
 
   const handleClose = React.useCallback(() => {
@@ -87,7 +88,7 @@ export default function useDialogHandle({ form, items }: Props): DialogHandle {
   }, [setValue, router])
 
   const handleSearch = React.useCallback(
-    (searchText: string): Items[] => {
+    (searchText: string): ItemSummary[] => {
       const matches = items.filter(
         item =>
           stringSimilarity.compareTwoStrings(

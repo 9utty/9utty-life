@@ -9,13 +9,18 @@ import {
   styled,
   Typography
 } from '@mui/material'
-import { useRouter } from 'next/router'
 import Draggable from 'react-draggable'
-import { Controller, useWatch } from 'react-hook-form'
+import { Controller, FormProvider, useWatch } from 'react-hook-form'
 import { ResizableBox } from 'react-resizable'
 import useDialogForm from 'src/hooks/dialog/useDialogForm'
 import useDialogHandle from 'src/hooks/dialog/useDialogHandle'
-import { PostUrl, validationPostUrl } from 'src/utils/validationPostUrl'
+import { NextPageContext } from 'next'
+import { ItemSummary, MainMenus, PostPageProps } from 'src/types'
+import BlogMainMenusComponent from 'src/components/main'
+import MainContentComponent from 'src/components/mainContent'
+import SubContentComponent from 'src/components/subContent'
+import ItemComponent from 'src/components/item'
+import Image from 'next/image'
 
 const StyledDialog = styled(Dialog)`
   .MuiPaper-root {
@@ -61,7 +66,7 @@ const StyledButton = styled('div')`
   border-left-color: #fff;
   border-top-color: #fff;
   color: black;
-  font-size: 14px;
+  font-size: 18px;
   padding: 5px 10px;
   display: flex;
   align-items: center;
@@ -128,7 +133,7 @@ const StyledCardBox = styled(Box)`
   width: 100%;
   height: 100%;
   overflow-y: scroll;
-  background-color: #c0c0c0;
+  background-color: fff;
   padding-left: 12px;
   padding-right: 12px;
   border: 3px solid #808080;
@@ -138,69 +143,38 @@ const StyledCardBox = styled(Box)`
   border-top-color: #808080;
 `
 
-export type MainMenu = {
-  id: number
-  name: string
-  createdAt: Date
-  updatedAt: Date
-  blogItems: Items[]
-  subMenus: SubMenu[]
-}
-
-export type SubMenu = {
-  id: number
-  mainMenuId: number
-  name: string
-  createdAt: Date
-  updatedAt: Date
-  blogItems: Items[]
-}
-
-export type Items = {
-  id: number
-  mainMenuId: number | null
-  subMenuId: number | null
-  title: string
-  path: string
-  viewCount: number
-  tag: string[]
-  createdAt: Date
-  updatedAt: Date
-}
-
 export default function PostComponent({
+  summaryItems,
   mainMenus,
-  items,
-  slug
-}: {
-  mainMenus: MainMenu[]
-  items: Items[]
-  slug: string[]
-}) {
-  const [postUrl, setPostUrl] = React.useState<PostUrl>({
-    mainMenu: '',
-    mainMenuId: '',
-    subMenu: '',
-    subMenuId: '',
-    item: '',
-    itemId: ''
-  })
+  subMenuContent,
+  mainMenuContent,
+  item,
+  type
+}: PostPageProps) {
   const draggableRef = React.useRef(null)
   const form = useDialogForm()
-  const { setValue, control, watch } = form
-  const handle = useDialogHandle({ form, items })
+  const { control, watch } = form
+  const handle = useDialogHandle({ form, items: summaryItems })
 
   const open = useWatch({ control, name: 'open' })
   const position = useWatch({ control, name: 'position' })
   const size = watch('size')
   const isFocus = watch('isFocus')
 
+  const handleClick = React.useCallback(
+    (e: MouseEvent) => {
+      const postDialog = document.getElementById('post-dialog')
+      const guestBookDialog = document.getElementById('방명록-dialog')
+      if (postDialog && guestBookDialog) {
+        postDialog.blur()
+        guestBookDialog.focus()
+      }
+    },
+    [handle]
+  )
+
   React.useEffect(() => {
     handle.handleOpen()
-    const postUrl = validationPostUrl(slug)
-    if (postUrl) {
-      setPostUrl(postUrl)
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -208,7 +182,10 @@ export default function PostComponent({
     <Draggable
       handle='.MuiDialogTitle-root'
       ref={draggableRef}
-      onMouseDown={() => handle.handleFocus()}
+      onMouseDown={() => {
+        handle.handleFocus()
+        handleClick()
+      }}
       onStart={() => handle.handleDragStart()}
       onStop={() => handle.handleDragStop()}
     >
@@ -217,6 +194,7 @@ export default function PostComponent({
         open={open}
         fullScreen={true}
         maxWidth='lg'
+        id='post-dialog'
         sx={{
           position: 'absolute',
           top: position.top,
@@ -231,15 +209,15 @@ export default function PostComponent({
           }
         }}
         hideBackdrop={true}
-        onBlur={() => handle.handleBlur()}
         onClick={() => handle.handleFocus()}
-        tabIndex={-1}
+        onBlur={() => handle.handleBlur()}
+        tabIndex={1}
       >
         <ResizableBox
           width={size.width}
           height={size.height}
           minConstraints={[200, 200]}
-          maxConstraints={[1000, 800]}
+          maxConstraints={[1800, 1000]}
           onResizeStart={() => handle.handleResizeStart()}
           onResizeStop={() => handle.handleResizeStop()}
           onResize={(e, data) => handle.handleResize(data)}
@@ -264,8 +242,16 @@ export default function PostComponent({
                 width: size.width - 5
               }}
             >
-              <Typography>게시글 페이지</Typography>
-
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Image
+                  src={'/directory_open_file_mydocs-0.png'}
+                  alt={'포스트'}
+                  width={25}
+                  height={25}
+                  priority={true}
+                />
+                <Typography>게시글 페이지</Typography>
+              </Box>
               <StyledButton onClick={() => handle.handleClose()}>
                 X
               </StyledButton>
@@ -362,11 +348,18 @@ export default function PostComponent({
               }}
             >
               <StyledCardBox>
-                {mainMenus.map(item => (
-                  <Box key={item.id}>
-                    <Typography>{item.name}</Typography>
-                  </Box>
-                ))}
+                <FormProvider {...form}>
+                  {type === 'mainMenus' && (
+                    <BlogMainMenusComponent mainMenus={mainMenus} />
+                  )}
+                  {type === 'mainMenuContent' && mainMenuContent && (
+                    <MainContentComponent mainMenuContent={mainMenuContent} />
+                  )}
+                  {type === 'subMenuContent' && subMenuContent && (
+                    <SubContentComponent subMenuContent={subMenuContent} />
+                  )}
+                  {type === 'item' && item && <ItemComponent item={item} />}
+                </FormProvider>
               </StyledCardBox>
             </Box>
           </Box>
@@ -376,48 +369,176 @@ export default function PostComponent({
   )
 }
 
-export async function getServerSideProps(context: any) {
-  const getAllMainMenus = async () => {
-    const baseUrl = `${process.env.MY_URL}api`
-    const res = await fetch(`${baseUrl}/allMainMenus`, {
-      next: { revalidate: 1000 }
+export async function getServerSideProps(context: NextPageContext) {
+  function isNumeric(value: string): boolean {
+    return /^\d+$/.test(value)
+  }
+
+  const revalidateData = 1200
+
+  const { slug } = context.query
+  const baseUrl = `${process.env.MY_URL}api`
+  const itemsRes = await fetch(`${baseUrl}/allItems`, {
+    method: 'GET',
+    next: { revalidate: revalidateData }
+  })
+  const summaryItems: ItemSummary[] = await itemsRes.json()
+
+  if (slug === undefined) {
+    const mainMenusRes = await fetch(`${baseUrl}/post`, {
+      method: 'GET',
+      next: { revalidate: revalidateData }
     })
 
-    if (!res.ok) {
-      throw new Error('Failed to fetch data')
+    const mainMenus: MainMenus = await mainMenusRes.json()
+    if (mainMenusRes.ok) {
+      return {
+        props: {
+          summaryItems,
+          mainMenus,
+          type: 'mainMenus'
+        }
+      }
+    } else {
+      return {
+        notFound: true
+      }
     }
-
-    const data = await res.json()
-    let items: Items[] = []
-    data.forEach((item: MainMenu) => {
-      console.log(item)
-      if (item.subMenus) {
-        item.subMenus.forEach(subMenu => {
-          if (subMenu.blogItems) {
-            items = [...items, ...subMenu.blogItems]
+  } else {
+    switch (slug.length) {
+      case 2:
+        if (slug[0] === 'main' && isNumeric(slug[1])) {
+          const mainMenuContentRes = await fetch(
+            `${baseUrl}/post/main/${slug[1]}`,
+            { method: 'GET', next: { revalidate: revalidateData } }
+          )
+          const mainMenuContent = await mainMenuContentRes.json()
+          if (mainMenuContentRes.ok) {
+            return {
+              props: {
+                summaryItems,
+                mainMenus: [],
+                subMenuContent: undefined,
+                item: undefined,
+                mainMenuContent,
+                type: 'mainMenuContent'
+              }
+            }
+          } else {
+            return {
+              notFound: true
+            }
           }
-        })
-      }
-      if (item.blogItems) {
-        items = [...items, ...item.blogItems]
-      }
-    })
-
-    return {
-      mainMenus: data,
-      items
+        }
+        break
+      case 4:
+        if (
+          slug[0] === 'main' &&
+          slug[2] === 'sub' &&
+          isNumeric(slug[1]) &&
+          isNumeric(slug[3])
+        ) {
+          const subMenuContentRes = await fetch(
+            `${baseUrl}/post/main/${slug[1]}/sub/${slug[3]}`,
+            { method: 'GET', next: { revalidate: revalidateData } }
+          )
+          const subMenuContent = await subMenuContentRes.json()
+          if (subMenuContentRes.ok) {
+            return {
+              props: {
+                summaryItems,
+                mainMenus: [],
+                subMenuContent,
+                mainMenuContent: undefined,
+                item: undefined,
+                type: 'subMenuContent'
+              }
+            }
+          } else {
+            return {
+              notFound: true
+            }
+          }
+        } else if (
+          slug[0] === 'main' &&
+          slug[2] === 'item' &&
+          isNumeric(slug[1]) &&
+          isNumeric(slug[3])
+        ) {
+          const itemContentRes = await fetch(
+            `${baseUrl}/post/main/${slug[1]}/item/${slug[3]}`,
+            { method: 'GET', next: { revalidate: revalidateData } }
+          )
+          const item = await itemContentRes.json()
+          if (itemContentRes.ok) {
+            return {
+              props: {
+                summaryItems,
+                mainMenus: [],
+                subMenuContent: undefined,
+                mainMenuContent: undefined,
+                item,
+                type: 'item'
+              }
+            }
+          } else {
+            return {
+              notFound: true
+            }
+          }
+        }
+        break
+      case 6:
+        if (
+          slug[0] === 'main' &&
+          slug[2] === 'sub' &&
+          slug[4] === 'item' &&
+          isNumeric(slug[1]) &&
+          isNumeric(slug[3]) &&
+          isNumeric(slug[5])
+        ) {
+          const itemContentRes = await fetch(
+            `${baseUrl}/post/main/${slug[1]}/sub/${slug[3]}/item/${slug[5]}`,
+            { method: 'GET', next: { revalidate: revalidateData } }
+          )
+          const item = await itemContentRes.json()
+          if (itemContentRes.ok) {
+            return {
+              props: {
+                summaryItems,
+                mainMenus: [],
+                subMenuContent: undefined,
+                mainMenuContent: undefined,
+                item,
+                type: 'item'
+              }
+            }
+          } else {
+            return {
+              notFound: true
+            }
+          }
+        } else {
+          return {
+            notFound: true
+          }
+        }
+        break
+      default:
+        return {
+          notFound: true
+        }
     }
   }
 
-  const data = await getAllMainMenus()
-
-  const slug = context.query.slug
-
   return {
     props: {
-      mainMenus: data.mainMenus,
-      items: data.items,
-      slug: slug ?? []
+      summaryItems,
+      mainMenus: [],
+      subMenuContent: undefined,
+      mainMenuContent: undefined,
+      item: undefined,
+      type: 'mainMenus'
     }
   }
 }

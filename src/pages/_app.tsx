@@ -38,8 +38,9 @@ export default function App(props: ExtendedAppProps) {
         <link rel='icon' sizes='any' href='/blog-favicon.png' />
       </Head>
       <ThemeProvider theme={theme}>
-        <MenesComponent />
-        <Component {...pageProps} />
+        <MenesComponent>
+          <Component {...pageProps} />
+        </MenesComponent>
         <WindowBar />
       </ThemeProvider>
     </CacheProvider>

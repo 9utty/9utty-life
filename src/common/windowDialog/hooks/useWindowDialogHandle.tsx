@@ -73,6 +73,7 @@ export default function useWindowDialogHandle({
   }, [setValue])
 
   const handleBlur = React.useCallback(() => {
+    console.log('handleBlur2')
     setValue('isFocus', false)
   }, [setValue])
 
