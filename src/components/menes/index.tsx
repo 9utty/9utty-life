@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
+import { DialogType } from 'src/types/enums/dialogEnum'
 
 const WindowDialog = dynamic(() => import('src/common/windowDialog'), {
   ssr: false
@@ -61,7 +62,10 @@ export default function MenesComponent({ children }: Props) {
             </Box>
           </Link>
         </Box>
-        <WindowDialog menu={menus.current} />
+        <WindowDialog
+          menu={menus.current}
+          currentDialogType={DialogType.GUEST_BOOK}
+        />
       </CardContent>
       {children}
     </React.Fragment>

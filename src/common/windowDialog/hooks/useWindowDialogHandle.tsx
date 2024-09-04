@@ -2,14 +2,17 @@
 
 import React from 'react'
 import { WindowDialogFormType } from './useWindowDialogForm'
+import { useFormContext } from 'react-hook-form'
+import { DialogFormDefaultValuesType } from 'src/pages/_app'
+import { DialogType } from 'src/types/enums/dialogEnum'
+import { DraggableData, DraggableEvent } from 'react-draggable'
 
-const randomPosition = () => `${10 + Math.random() * 35}%`
+const randomPosition = (max: number) => `${Math.floor(Math.random() * max)}px`
 
 export type WindowDialogHandle = {
-  handleBlur: () => void
   handleClose: () => void
   handleDragStart: () => void
-  handleDragStop: () => void
+  handleDragStop: (e: DraggableEvent, data: DraggableData) => void
   handleFocus: () => void
   handleOpen: () => void
   handleResize: ({ size }: { size: { width: number; height: number } }) => void
@@ -24,66 +27,138 @@ type Props = {
 export default function useWindowDialogHandle({
   form
 }: Props): WindowDialogHandle {
-  const { setValue } = form
+  const { setValue: dialogSetValue, watch: dialogWatch } =
+    useFormContext<DialogFormDefaultValuesType>()
+  const { setValue, watch } = form
+
+  const dialogType = dialogWatch('type')
+  const openCount = dialogWatch('openCount')
+  const open = watch('open')
+  const sizeValue = watch('size')
+  const position = watch('position')
 
   const handleOpen = React.useCallback(() => {
     setValue('open', true)
-    setValue('isFocus', true)
-    setValue('position', {
-      top: randomPosition(),
-      left: randomPosition()
-    })
-    setValue('size', {
-      width: 850,
-      height: 650
-    })
-  }, [setValue])
+    const data = localStorage.getItem(`${DialogType.GUEST_BOOK}`)
+    let newPosition = {
+      top: randomPosition(window.innerHeight - 350),
+      left: randomPosition(window.innerWidth - 350)
+    }
+    if (data) {
+      newPosition = JSON.parse(data).position
+      const size = JSON.parse(data).size
+      const open = JSON.parse(data).open
+      setValue('size', size)
+      setValue('open', open)
+      setValue('position', newPosition)
+    } else {
+      setValue('position', newPosition)
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(
+          `${DialogType.GUEST_BOOK}`,
+          JSON.stringify({
+            position: newPosition,
+            open: true,
+            size: {
+              width: 850,
+              height: 650
+            }
+          })
+        )
+      }
+      setValue('size', {
+        width: 850,
+        height: 650
+      })
+    }
+    dialogSetValue('type', DialogType.POST)
+    dialogSetValue('openCount', openCount + 1)
+  }, [setValue, openCount, dialogSetValue])
 
   const handleFocus = React.useCallback(() => {
-    setValue('isFocus', true)
-  }, [setValue])
+    if (dialogType !== DialogType.GUEST_BOOK) {
+      dialogSetValue('type', DialogType.GUEST_BOOK)
+    }
+  }, [dialogType, dialogSetValue])
 
   const handleResize = React.useCallback(
     ({ size }: { size: { width: number; height: number } }) => {
       setValue('size', size)
-      setValue('isResize', true)
-      setValue('isFocus', true)
+      if (dialogType !== DialogType.GUEST_BOOK) {
+        dialogSetValue('type', DialogType.GUEST_BOOK)
+      }
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(
+          `${DialogType.GUEST_BOOK}`,
+          JSON.stringify({
+            position: position,
+            open: open,
+            size: size
+          })
+        )
+      }
     },
-    [setValue]
+    [dialogType, dialogSetValue, setValue, position, open]
   )
 
   const handleResizeStart = React.useCallback(() => {
-    setValue('isResize', true)
-    setValue('isFocus', true)
-  }, [setValue])
+    if (dialogType !== DialogType.GUEST_BOOK) {
+      dialogSetValue('type', DialogType.GUEST_BOOK)
+    }
+  }, [dialogType, dialogSetValue])
 
   const handleResizeStop = React.useCallback(() => {
-    setValue('isResize', false)
-    setValue('isFocus', true)
-  }, [setValue])
+    if (dialogType !== DialogType.GUEST_BOOK) {
+      dialogSetValue('type', DialogType.GUEST_BOOK)
+    }
+  }, [dialogType, dialogSetValue])
 
   const handleDragStart = React.useCallback(() => {
-    setValue('isDrag', true)
-    setValue('isFocus', true)
-  }, [setValue])
+    if (dialogType !== DialogType.GUEST_BOOK) {
+      dialogSetValue('type', DialogType.GUEST_BOOK)
+    }
+  }, [dialogType, dialogSetValue])
 
-  const handleDragStop = React.useCallback(() => {
-    setValue('isDrag', false)
-    setValue('isFocus', true)
-  }, [setValue])
-
-  const handleBlur = React.useCallback(() => {
-    console.log('handleBlur2')
-    setValue('isFocus', false)
-  }, [setValue])
+  const handleDragStop = React.useCallback(
+    (e: DraggableEvent, data: DraggableData) => {
+      if (dialogType !== DialogType.GUEST_BOOK) {
+        dialogSetValue('type', DialogType.GUEST_BOOK)
+      }
+      const { top, left } = form.watch('position')
+      const topNumber = parseInt(top.replace('px', ''))
+      const leftNumber = parseInt(left.replace('px', ''))
+      const newPosition = {
+        top: `${topNumber + data.y}px`,
+        left: `${leftNumber + data.x}px`
+      }
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(
+          `${DialogType.GUEST_BOOK}`,
+          JSON.stringify({
+            position: newPosition,
+            open: open,
+            size: sizeValue
+          })
+        )
+      }
+    },
+    [dialogType, dialogSetValue, form, sizeValue, open]
+  )
 
   const handleClose = React.useCallback(() => {
     setValue('open', false)
-    setValue('isFocus', false)
-  }, [setValue])
+    if (openCount === 1) {
+      dialogSetValue('type', DialogType.NONE)
+    } else {
+      dialogSetValue('openCount', openCount - 1)
+      dialogSetValue('type', DialogType.GUEST_BOOK)
+    }
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(`${DialogType.GUEST_BOOK}`)
+    }
+  }, [setValue, openCount, dialogSetValue])
 
   return {
-    handleBlur,
     handleClose,
     handleDragStart,
     handleDragStop,

@@ -10,12 +10,14 @@ import {
   Typography
 } from '@mui/material'
 import Draggable from 'react-draggable'
-import { useWatch } from 'react-hook-form'
+import { useFormContext, useWatch } from 'react-hook-form'
 import { ResizableBox } from 'react-resizable'
 import useWindowDialogForm from 'src/common/windowDialog/hooks/useWindowDialogForm'
 import useWindowDialogHandle from 'src/common/windowDialog/hooks/useWindowDialogHandle'
 import { Menu } from 'src/components/menes'
 import Image from 'next/image'
+import { DialogFormDefaultValuesType } from 'src/pages/_app'
+import { DialogType } from 'src/types/enums/dialogEnum'
 
 const StyledDialog = styled(Dialog)`
   .MuiPaper-root {
@@ -61,7 +63,7 @@ const StyledButton = styled('div')`
   border-left-color: #fff;
   border-top-color: #fff;
   color: black;
-  font-size: 14px;
+  font-size: 18px;
   padding: 5px 10px;
   display: flex;
   align-items: center;
@@ -122,18 +124,32 @@ const StyledCardBox = styled(Box)`
 
 interface WindowDialogProps {
   menu: Menu
+  currentDialogType: DialogType
 }
 
-export default function WindowDialogComponent({ menu }: WindowDialogProps) {
+export default function WindowDialogComponent({
+  menu,
+  currentDialogType
+}: WindowDialogProps) {
+  const { watch: dialogWatch } = useFormContext<DialogFormDefaultValuesType>()
+
   const draggableRef = React.useRef(null)
   const form = useWindowDialogForm()
   const { control, watch } = form
   const handle = useWindowDialogHandle({ form })
 
+  const dialogType = dialogWatch('type')
   const position = useWatch({ control, name: 'position' })
   const size = watch('size')
-  const isFocus = watch('isFocus')
   const open = watch('open')
+
+  React.useEffect(() => {
+    const dialogData = localStorage.getItem(`${DialogType.GUEST_BOOK}`)
+    if (dialogData) {
+      handle.handleOpen()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <React.Fragment>
@@ -164,7 +180,7 @@ export default function WindowDialogComponent({ menu }: WindowDialogProps) {
         ref={draggableRef}
         onMouseDown={() => handle.handleFocus()}
         onStart={() => handle.handleDragStart()}
-        onStop={() => handle.handleDragStop()}
+        onStop={handle.handleDragStop}
       >
         <StyledDialog
           ref={draggableRef}
@@ -173,13 +189,13 @@ export default function WindowDialogComponent({ menu }: WindowDialogProps) {
           maxWidth='lg'
           id={`${menu.name}-dialog`}
           sx={{
-            position: 'absolute',
+            position: dialogType === currentDialogType ? 'absolute' : '',
             top: position.top,
             left: position.left,
             width: size.width,
             height: size.height,
             m: 0,
-            zIndex: isFocus ? 1001 : 1000,
+            zIndex: dialogType === currentDialogType ? 1001 : 1000,
             '.MuiPaper-root': {
               width: size.width,
               height: size.height
@@ -187,11 +203,6 @@ export default function WindowDialogComponent({ menu }: WindowDialogProps) {
           }}
           hideBackdrop={true}
           onClick={() => handle.handleFocus()}
-          onBlur={e => {
-            if (e.currentTarget) {
-              handle.handleBlur()
-            }
-          }}
         >
           <ResizableBox
             width={size.width}
@@ -215,15 +226,25 @@ export default function WindowDialogComponent({ menu }: WindowDialogProps) {
             >
               <StyledDialogTitle
                 sx={{
-                  backgroundColor: isFocus ? '#000080' : '#c6c6c6', // Change background color based on zIndex
+                  backgroundColor:
+                    dialogType === currentDialogType ? '#000080' : '#c6c6c6',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   width: size.width - 5
                 }}
               >
-                <Typography>{menu.name}</Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <Image
+                    src={menu.img}
+                    alt={menu.name}
+                    width={25}
+                    height={25}
+                    priority={true}
+                  />
 
+                  <Typography>{menu.name}</Typography>
+                </Box>
                 <StyledButton
                   onClick={() => {
                     handle.handleClose()

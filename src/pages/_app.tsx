@@ -13,6 +13,8 @@ import MenesComponent from 'src/components/menes'
 import { CacheProvider } from '@emotion/react'
 import type { EmotionCache } from '@emotion/cache'
 import { createEmotionCache } from 'src/theme/createEmotionCache'
+import { DialogType } from 'src/types/enums/dialogEnum'
+import { FormProvider, useForm } from 'react-hook-form'
 
 const clientSideEmotionCache = createEmotionCache()
 
@@ -21,8 +23,19 @@ type ExtendedAppProps = AppProps & {
   emotionCache: EmotionCache
 }
 
+export type DialogFormDefaultValuesType = {
+  type: DialogType
+  openCount: number
+}
+
 export default function App(props: ExtendedAppProps) {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
+  const form = useForm<DialogFormDefaultValuesType>({
+    defaultValues: {
+      type: DialogType.NONE,
+      openCount: 0
+    }
+  })
 
   React.useEffect(() => {
     console.log('App mounted')
@@ -38,9 +51,11 @@ export default function App(props: ExtendedAppProps) {
         <link rel='icon' sizes='any' href='/blog-favicon.png' />
       </Head>
       <ThemeProvider theme={theme}>
-        <MenesComponent>
-          <Component {...pageProps} />
-        </MenesComponent>
+        <FormProvider {...form}>
+          <MenesComponent>
+            <Component {...pageProps} />
+          </MenesComponent>
+        </FormProvider>
         <WindowBar />
       </ThemeProvider>
     </CacheProvider>

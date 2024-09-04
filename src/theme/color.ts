@@ -1,14 +1,16 @@
+/** @format */
+
 // ** Type Imports
 import { Palette } from '@mui/material'
-import { PaletteAugmentColorOptions, PaletteColorOptions } from '@mui/material/styles/createPalette'
+import {
+  PaletteAugmentColorOptions,
+  PaletteColorOptions
+} from '@mui/material/styles/createPalette'
 
 const DefaultPalette = (mode: Palette['mode']): Palette => {
   // ** Vars
   const whiteColor = '#FFF'
-  const lightColor = '47, 43, 61'
-  const darkColor = '208, 212, 241'
   const darkPaperBgColor = '#2F3349'
-  const mainColor = mode === 'light' ? lightColor : darkColor
 
   const defaultBgColor = () => {
     if (mode === 'light') {
@@ -77,27 +79,27 @@ const DefaultPalette = (mode: Palette['mode']): Palette => {
       A700: '#616161'
     },
     text: {
-      primary: `rgba(${mainColor}, 0.78)`,
-      secondary: `rgba(${mainColor}, 0.68)`,
-      disabled: `rgba(${mainColor}, 0.42)`
+      primary: `rgba(47, 43, 61, 0.78)`,
+      secondary: `rgba(47, 43, 61, 0.68)`,
+      disabled: `rgba(47, 43, 61, 0.42)`
     },
-    divider: `rgba(${mainColor}, 0.16)`,
+    divider: `rgba(208, 212, 241, 0.16)`,
     background: {
-      paper: '#c6c6c6',
+      paper: '#c0c0c6-',
       default: defaultBgColor()
     },
     action: {
-      active: `rgba(${mainColor}, 0.54)`,
-      hover: `rgba(${mainColor}, 0.04)`,
+      active: `rgba(47, 43, 61, 0.54)`,
+      hover: `rgba(47, 43, 61, 0.04)`,
       hoverOpacity: 0.04,
-      selected: `rgba(${mainColor}, 0.06)`,
+      selected: `rgba(47, 43, 61, 0.06)`,
       selectedOpacity: 0.06,
       disabledOpacity: 0.26,
       focusOpacity: 0.12,
       activatedOpacity: 0.12,
-      disabled: `rgba(${mainColor}, 0.26)`,
-      disabledBackground: `rgba(${mainColor}, 0.12)`,
-      focus: `rgba(${mainColor}, 0.12)`
+      disabled: `rgba(47, 43, 61, 0.26)`,
+      disabledBackground: `rgba(47, 43, 61, 0.12)`,
+      focus: `rgba(47, 43, 61, 0.12)`
     },
     contrastThreshold: 3,
     tonalOffset: 0.2,
@@ -105,7 +107,12 @@ const DefaultPalette = (mode: Palette['mode']): Palette => {
       return background === whiteColor ? '#000' : whiteColor
     },
     augmentColor: (options: PaletteAugmentColorOptions) => {
-      const { color, mainShade = 500, lightShade = 300, darkShade = 700 } = options
+      const {
+        color,
+        mainShade = 500,
+        lightShade = 300,
+        darkShade = 700
+      } = options
 
       return {
         light: color[lightShade as keyof PaletteColorOptions],

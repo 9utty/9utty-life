@@ -10,7 +10,12 @@ import {
   Typography
 } from '@mui/material'
 import Draggable from 'react-draggable'
-import { Controller, FormProvider, useWatch } from 'react-hook-form'
+import {
+  Controller,
+  FormProvider,
+  useFormContext,
+  useWatch
+} from 'react-hook-form'
 import { ResizableBox } from 'react-resizable'
 import useDialogForm from 'src/hooks/dialog/useDialogForm'
 import useDialogHandle from 'src/hooks/dialog/useDialogHandle'
@@ -21,6 +26,9 @@ import MainContentComponent from 'src/components/mainContent'
 import SubContentComponent from 'src/components/subContent'
 import ItemComponent from 'src/components/item'
 import Image from 'next/image'
+import { DialogFormDefaultValuesType } from 'src/pages/_app'
+import { DialogType } from 'src/types/enums/dialogEnum'
+import { useRouter } from 'next/router'
 
 const StyledDialog = styled(Dialog)`
   .MuiPaper-root {
@@ -134,8 +142,6 @@ const StyledCardBox = styled(Box)`
   height: 100%;
   overflow-y: scroll;
   background-color: fff;
-  padding-left: 12px;
-  padding-right: 12px;
   border: 3px solid #808080;
   border-right-color: #fff;
   border-bottom-color: #fff;
@@ -151,6 +157,8 @@ export default function PostComponent({
   item,
   type
 }: PostPageProps) {
+  const { watch: dialogWatch } = useFormContext<DialogFormDefaultValuesType>()
+  const inputRef = React.useRef<HTMLInputElement>(null)
   const draggableRef = React.useRef(null)
   const form = useDialogForm()
   const { control, watch } = form
@@ -159,19 +167,8 @@ export default function PostComponent({
   const open = useWatch({ control, name: 'open' })
   const position = useWatch({ control, name: 'position' })
   const size = watch('size')
-  const isFocus = watch('isFocus')
-
-  const handleClick = React.useCallback(
-    (e: MouseEvent) => {
-      const postDialog = document.getElementById('post-dialog')
-      const guestBookDialog = document.getElementById('방명록-dialog')
-      if (postDialog && guestBookDialog) {
-        postDialog.blur()
-        guestBookDialog.focus()
-      }
-    },
-    [handle]
-  )
+  const dialogType = dialogWatch('type')
+  const router = useRouter()
 
   React.useEffect(() => {
     handle.handleOpen()
@@ -184,10 +181,9 @@ export default function PostComponent({
       ref={draggableRef}
       onMouseDown={() => {
         handle.handleFocus()
-        handleClick()
       }}
       onStart={() => handle.handleDragStart()}
-      onStop={() => handle.handleDragStop()}
+      onStop={handle.handleDragStop}
     >
       <StyledDialog
         ref={draggableRef}
@@ -202,7 +198,7 @@ export default function PostComponent({
           width: size.width,
           height: size.height,
           m: 0,
-          zIndex: isFocus ? 1001 : 1000,
+          zIndex: dialogType === DialogType.POST ? 1001 : 1000,
           '.MuiPaper-root': {
             width: size.width,
             height: size.height
@@ -210,7 +206,6 @@ export default function PostComponent({
         }}
         hideBackdrop={true}
         onClick={() => handle.handleFocus()}
-        onBlur={() => handle.handleBlur()}
         tabIndex={1}
       >
         <ResizableBox
@@ -235,7 +230,8 @@ export default function PostComponent({
           >
             <StyledDialogTitle
               sx={{
-                backgroundColor: isFocus ? '#000080' : '#c6c6c6', // Change background color based on zIndex
+                backgroundColor:
+                  dialogType === DialogType.POST ? '#000080' : '#c6c6c6', // Change background color based on zIndex
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
@@ -273,18 +269,18 @@ export default function PostComponent({
                 }}
               >
                 <Box sx={{ display: 'flex', minWidth: 160 }}>
-                  <StyledMenuButton onClick={() => handle.handleClose()}>
+                  <StyledMenuButton
+                    onClick={() => {
+                      if (
+                        typeof window !== 'undefined' &&
+                        window.history.length > 0
+                      ) {
+                        router.back()
+                      }
+                    }}
+                  >
                     <Typography>{'< 뒤로'} </Typography>
                   </StyledMenuButton>
-                  <StyledMenuButton
-                    onClick={() => handle.handleClose()}
-                    disabled={true}
-                  >
-                    <Typography>{'앞으로 >'} </Typography>
-                  </StyledMenuButton>
-                </Box>
-                <Box>
-                  <Typography>검색하기</Typography>
                 </Box>
               </Box>
               <Box
@@ -315,9 +311,12 @@ export default function PostComponent({
                   render={({ field }) => (
                     <React.Fragment>
                       <StyledSearchInput
+                        ref={inputRef}
                         value={field.value}
                         onChange={e => field.onChange(e.target.value)}
+                        onClick={() => inputRef.current?.focus()}
                       />
+
                       <StyledButton
                         style={{
                           width: 70,
@@ -412,14 +411,14 @@ export async function getServerSideProps(context: NextPageContext) {
             `${baseUrl}/post/main/${slug[1]}`,
             { method: 'GET', next: { revalidate: revalidateData } }
           )
-          const mainMenuContent = await mainMenuContentRes.json()
           if (mainMenuContentRes.ok) {
+            const mainMenuContent = await mainMenuContentRes.json()
+            console.log(mainMenuContent)
+
             return {
               props: {
                 summaryItems,
                 mainMenus: [],
-                subMenuContent: undefined,
-                item: undefined,
                 mainMenuContent,
                 type: 'mainMenuContent'
               }
@@ -449,8 +448,6 @@ export async function getServerSideProps(context: NextPageContext) {
                 summaryItems,
                 mainMenus: [],
                 subMenuContent,
-                mainMenuContent: undefined,
-                item: undefined,
                 type: 'subMenuContent'
               }
             }
@@ -475,8 +472,6 @@ export async function getServerSideProps(context: NextPageContext) {
               props: {
                 summaryItems,
                 mainMenus: [],
-                subMenuContent: undefined,
-                mainMenuContent: undefined,
                 item,
                 type: 'item'
               }
@@ -507,8 +502,6 @@ export async function getServerSideProps(context: NextPageContext) {
               props: {
                 summaryItems,
                 mainMenus: [],
-                subMenuContent: undefined,
-                mainMenuContent: undefined,
                 item,
                 type: 'item'
               }
@@ -535,9 +528,6 @@ export async function getServerSideProps(context: NextPageContext) {
     props: {
       summaryItems,
       mainMenus: [],
-      subMenuContent: undefined,
-      mainMenuContent: undefined,
-      item: undefined,
       type: 'mainMenus'
     }
   }
