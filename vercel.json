@@ -7,8 +7,5 @@
         "includeFiles": ["prisma/schema.prisma"]
       }
     }
-  ],
-  "scripts": {
-    "build": "prisma generate && next build"
-  }
+  ]
 }
