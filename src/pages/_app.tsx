@@ -15,6 +15,7 @@ import type { EmotionCache } from '@emotion/cache'
 import { createEmotionCache } from 'src/theme/createEmotionCache'
 import { DialogType } from 'src/types/enums/dialogEnum'
 import { FormProvider, useForm } from 'react-hook-form'
+import { Analytics } from '@vercel/analytics/react'
 
 const clientSideEmotionCache = createEmotionCache()
 
@@ -48,6 +49,7 @@ export default function App(props: ExtendedAppProps) {
         <FormProvider {...form}>
           <MenesComponent>
             <Component {...pageProps} />
+            <Analytics />
           </MenesComponent>
         </FormProvider>
         <WindowBar />
