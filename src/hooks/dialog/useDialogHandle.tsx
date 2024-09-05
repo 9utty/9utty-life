@@ -10,7 +10,9 @@ import { useFormContext } from 'react-hook-form'
 import { DialogFormDefaultValuesType } from 'src/pages/_app'
 import { DraggableData, DraggableEvent } from 'react-draggable'
 
-const randomPosition = (max: number) => `${Math.floor(Math.random() * max)}px`
+const randomPosition = () => {
+  return `${Math.floor(Math.random() * 256) + 234}px`
+}
 
 export type DialogHandle = {
   handleClose: () => void
@@ -44,8 +46,8 @@ export default function useDialogHandle({ form, items }: Props): DialogHandle {
     setValue('open', true)
     const data = localStorage.getItem(`${DialogType.POST}`)
     let newPosition = {
-      top: randomPosition(window.innerHeight - 350),
-      left: randomPosition(window.innerWidth - 350)
+      top: randomPosition(),
+      left: randomPosition()
     }
     if (data) {
       newPosition = JSON.parse(data).position

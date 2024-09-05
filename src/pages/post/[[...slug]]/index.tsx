@@ -175,6 +175,21 @@ export default function PostComponent({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  React.useEffect(() => {
+    const keyEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        // 변경된 부분
+        handle.handleClose()
+      }
+    }
+    window.addEventListener('keydown', keyEsc)
+
+    return () => {
+      window.removeEventListener('keydown', keyEsc)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   return (
     <Draggable
       handle='.MuiDialogTitle-root'
@@ -206,6 +221,7 @@ export default function PostComponent({
         }}
         hideBackdrop={true}
         onClick={() => handle.handleFocus()}
+        onClose={() => handle.handleClose()}
         tabIndex={1}
       >
         <ResizableBox

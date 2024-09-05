@@ -1,3 +1,5 @@
+/** @format */
+
 import React from 'react'
 import { Box, styled, Typography } from '@mui/material'
 
@@ -51,11 +53,8 @@ export default function WindowTrayContainer() {
       setAmpm(new Date().getHours() >= 12 ? 'PM' : 'AM')
     }, 60000) // 1 minute interval
 
-    console.log('interval set')
-
     return () => {
       clearInterval(interval)
-      console.log('interval cleared')
       setHour('')
       setMinute('')
       setAmpm('')

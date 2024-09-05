@@ -32,12 +32,17 @@ export default async function handler(
           const mainDataById = await client.blogMainMenu.findMany({
             include: {
               subMenus: true,
-              blogItems: true
+              blogItems: {
+                where: {
+                  subMenuId: null
+                }
+              }
             },
             where: {
               id: Number(slug[1])
             }
           })
+
           if (mainDataById) {
             res.status(200).json(mainDataById)
           } else {
@@ -88,7 +93,7 @@ export default async function handler(
             }
           })
           if (itemDataById) {
-            client.blogItem.update({
+            await client.blogItem.update({
               where: {
                 id: Number(slug[3])
               },
@@ -162,7 +167,7 @@ export default async function handler(
             }
           })
           if (itemDataById) {
-            client.blogItem.update({
+            await client.blogItem.update({
               where: {
                 id: Number(slug[5])
               },

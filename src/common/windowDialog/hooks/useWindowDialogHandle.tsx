@@ -7,8 +7,9 @@ import { DialogFormDefaultValuesType } from 'src/pages/_app'
 import { DialogType } from 'src/types/enums/dialogEnum'
 import { DraggableData, DraggableEvent } from 'react-draggable'
 
-const randomPosition = (max: number) => `${Math.floor(Math.random() * max)}px`
-
+const randomPosition = () => {
+  return `${Math.floor(Math.random() * 300) + 150}px`
+}
 export type WindowDialogHandle = {
   handleClose: () => void
   handleDragStart: () => void
@@ -41,8 +42,8 @@ export default function useWindowDialogHandle({
     setValue('open', true)
     const data = localStorage.getItem(`${DialogType.GUEST_BOOK}`)
     let newPosition = {
-      top: randomPosition(window.innerHeight - 350),
-      left: randomPosition(window.innerWidth - 350)
+      top: randomPosition(),
+      left: randomPosition()
     }
     if (data) {
       newPosition = JSON.parse(data).position

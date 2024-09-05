@@ -160,7 +160,7 @@ export default function WindowDialogComponent({
         handle.handleClose()
       }
     }
-    console.log('keyEsc')
+
     window.addEventListener('keydown', keyEsc)
 
     return () => {

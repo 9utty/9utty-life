@@ -37,12 +37,6 @@ export default function App(props: ExtendedAppProps) {
     }
   })
 
-  React.useEffect(() => {
-    console.log('App mounted')
-
-    return () => console.log('App unmounted')
-  }, [])
-
   return (
     <CacheProvider value={emotionCache}>
       <Head>

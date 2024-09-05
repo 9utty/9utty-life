@@ -39,7 +39,14 @@ export default function MenesComponent({ children }: Props) {
         }}
       >
         <Box>
-          <Link href={'/post'}>
+          <Link
+            href={'/post'}
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                localStorage.removeItem('post')
+              }
+            }}
+          >
             <Box
               sx={{
                 display: 'flex',
