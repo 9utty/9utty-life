@@ -376,12 +376,15 @@ export async function getServerSideProps(context: NextPageContext) {
   function isNumeric(value: string): boolean {
     return /^\d+$/.test(value)
   }
+  context.res!.setHeader(
+    'Cache-Control',
+    'public, s-maxage=10, stale-while-revalidate=59'
+  )
 
   const revalidateData = 1200
 
   const { slug } = context.query
   const { req } = context
-  console.log('slug', req)
   const protocol = req?.headers['x-forwarded-proto'] || 'http'
   const host = req?.headers['host']
 
