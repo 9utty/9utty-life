@@ -380,7 +380,13 @@ export async function getServerSideProps(context: NextPageContext) {
   const revalidateData = 1200
 
   const { slug } = context.query
-  const baseUrl = `${process.env.MY_URL}api`
+  const { req } = context
+  console.log('slug', req)
+  const protocol = req?.headers['x-forwarded-proto'] || 'http'
+  const host = req?.headers['host']
+
+  const baseUrl = `${protocol}://${host}/api`
+
   const itemsRes = await fetch(`${baseUrl}/allItems`, {
     method: 'GET',
     next: { revalidate: revalidateData }
