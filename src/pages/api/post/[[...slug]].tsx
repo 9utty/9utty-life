@@ -2,6 +2,10 @@
 
 import { PrismaClient } from '@prisma/client'
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { serialize } from 'next-mdx-remote/serialize'
+import rehypeAutolinkHeadings from 'rehype-autolink-headings'
+import rehypeSlug from 'rehype-slug'
+import rehypeHighlight from 'rehype-highlight'
 
 const client = new PrismaClient()
 
@@ -109,9 +113,30 @@ export default async function handler(
                 .json({ error: 'Failed to fetch file contents' })
             }
             const fileContent = await fileResponse.text()
+
+            if (fileContent === '404: Not Found') {
+              return res.status(404).json({ error: 'Item not found' })
+            }
+
+            const result = await serialize(fileContent, {
+              parseFrontmatter: true,
+              mdxOptions: {
+                rehypePlugins: [
+                  rehypeHighlight,
+                  rehypeSlug,
+                  [
+                    rehypeAutolinkHeadings,
+                    {
+                      behavior: 'wrap'
+                    }
+                  ]
+                ]
+              }
+            })
+
             res.status(200).json({
               item: itemDataById,
-              compiledSource: fileContent
+              compiledSource: result
             })
           } else {
             res.status(404).json({ error: 'Item not found' })
@@ -161,9 +186,30 @@ export default async function handler(
                 .json({ error: 'Failed to fetch file contents' })
             }
             const fileContent = await fileResponse.text()
+
+            if (fileContent === '404: Not Found') {
+              return res.status(404).json({ error: 'Item not found' })
+            }
+
+            const result = await serialize(fileContent, {
+              parseFrontmatter: true,
+              mdxOptions: {
+                rehypePlugins: [
+                  rehypeHighlight,
+                  rehypeSlug,
+                  [
+                    rehypeAutolinkHeadings,
+                    {
+                      behavior: 'wrap'
+                    }
+                  ]
+                ]
+              }
+            })
+
             res.status(200).json({
               item: itemDataById,
-              compiledSource: fileContent
+              compiledSource: result
             })
           } else {
             res.status(404).json({ error: 'Item not found' })

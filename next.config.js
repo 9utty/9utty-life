@@ -19,6 +19,7 @@ module.exports = {
   output: 'standalone',
   trailingSlash: false,
   reactStrictMode: true,
+
   webpack: config => {
     config.resolve.alias = {
       ...config.resolve.alias,

@@ -6,6 +6,7 @@ import {
   Button,
   Dialog,
   DialogTitle,
+  Grid,
   styled,
   Typography
 } from '@mui/material'
@@ -18,6 +19,7 @@ import { Menu } from 'src/components/menes'
 import Image from 'next/image'
 import { DialogFormDefaultValuesType } from 'src/pages/_app'
 import { DialogType } from 'src/types/enums/dialogEnum'
+import TitleUtterances from 'src/components/utterances/titleUtterances'
 
 const StyledDialog = styled(Dialog)`
   .MuiPaper-root {
@@ -151,6 +153,22 @@ export default function WindowDialogComponent({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  React.useEffect(() => {
+    const keyEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        // 변경된 부분
+        handle.handleClose()
+      }
+    }
+    console.log('keyEsc')
+    window.addEventListener('keydown', keyEsc)
+
+    return () => {
+      window.removeEventListener('keydown', keyEsc)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   return (
     <React.Fragment>
       <Button onClick={() => handle.handleOpen()}>
@@ -188,6 +206,7 @@ export default function WindowDialogComponent({
           fullScreen={true}
           maxWidth='lg'
           id={`${menu.name}-dialog`}
+          onClose={() => handle.handleClose()}
           sx={{
             position: dialogType === currentDialogType ? 'absolute' : '',
             top: position.top,
@@ -321,7 +340,13 @@ export default function WindowDialogComponent({
                   height: size.height - 110 - 45 - 5
                 }}
               >
-                <StyledCardBox>hi</StyledCardBox>
+                <StyledCardBox>
+                  <Grid container spacing={6}>
+                    <Grid item xs={12}>
+                      <TitleUtterances />
+                    </Grid>
+                  </Grid>
+                </StyledCardBox>
               </Box>
             </Box>
           </ResizableBox>

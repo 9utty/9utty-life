@@ -351,9 +351,13 @@ export default function PostComponent({
                   {type === 'mainMenus' && (
                     <BlogMainMenusComponent mainMenus={mainMenus} />
                   )}
-                  {type === 'mainMenuContent' && mainMenuContent && (
-                    <MainContentComponent mainMenuContent={mainMenuContent} />
-                  )}
+                  {type === 'mainMenuContent' &&
+                    mainMenuContent &&
+                    mainMenuContent.at(0) && (
+                      <MainContentComponent
+                        mainMenuContent={mainMenuContent[0]}
+                      />
+                    )}
                   {type === 'subMenuContent' && subMenuContent && (
                     <SubContentComponent subMenuContent={subMenuContent} />
                   )}
@@ -413,7 +417,6 @@ export async function getServerSideProps(context: NextPageContext) {
           )
           if (mainMenuContentRes.ok) {
             const mainMenuContent = await mainMenuContentRes.json()
-            console.log(mainMenuContent)
 
             return {
               props: {

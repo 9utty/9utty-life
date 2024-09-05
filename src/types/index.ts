@@ -45,7 +45,7 @@ export type PostMainGet = MainMenus
 export type PostByMainIdWithSubMenusAndItems = {
   mainMenu: MainMenu
   subMenus: SubMenus
-  items: Items
+  blogItems: Items
 }
 export type PostBySubMenuIdWithItems = {
   subMenu: SubMenu
@@ -60,7 +60,7 @@ export type PostPageProps = {
   summaryItems: ItemSummary[]
   mainMenus: PostMainGet
   subMenuContent: PostBySubMenuIdWithItems | undefined
-  mainMenuContent: PostByMainIdWithSubMenusAndItems | undefined
+  mainMenuContent: PostByMainIdWithSubMenusAndItems[] | undefined
   item: PostByItemId | undefined
   type: 'mainMenus' | 'mainMenuContent' | 'subMenuContent' | 'item'
 }

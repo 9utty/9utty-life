@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint --fix \"src/**/*.{js,jsx,ts,tsx}\""
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.4.1",
@@ -38,6 +38,7 @@
     "string-similarity": "^4.0.4"
   },
   "devDependencies": {
+    "@next/eslint-plugin-next": "^14.2.8",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

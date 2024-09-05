@@ -1,3 +1,5 @@
+/** @format */
+
 // ** React Import
 import { Children } from 'react'
 
@@ -21,7 +23,11 @@ class CustomDocument extends Document {
             rel='stylesheet'
             href='https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap'
           />
-          <link rel='apple-touch-icon' sizes='180x180' href='/images/apple-touch-icon.png' />
+          <link
+            rel='apple-touch-icon'
+            sizes='180x180'
+            href='/images/apple-touch-icon.png'
+          />
           <link rel='shortcut icon' href='/images/favicon.png' />
         </Head>
         <body>
@@ -40,13 +46,12 @@ CustomDocument.getInitialProps = async ctx => {
 
   ctx.renderPage = () =>
     originalRenderPage({
-      enhanceApp: App => props =>
-        (
-          <App
-            {...props} // @ts-ignore
-            emotionCache={cache}
-          />
-        )
+      enhanceApp: App => props => (
+        <App
+          {...props} // @ts-ignore
+          emotionCache={cache}
+        />
+      )
     })
 
   const initialProps = await Document.getInitialProps(ctx)

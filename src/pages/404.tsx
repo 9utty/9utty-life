@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/alt-text */
 /** @format */
 
 import { Typography } from '@mui/material'

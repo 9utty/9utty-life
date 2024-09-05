@@ -1,5 +1,9 @@
 {
-  "extends": ["eslint:recommended", "plugin:react/recommended", "plugin:@typescript-eslint/recommended"],
+  "extends": [
+    "next/core-web-vitals",
+    "plugin:@typescript-eslint/recommended",
+    "prettier"
+  ],
 
   "rules": {
     "react-hooks/rules-of-hooks": "error", // Checks rules of Hooks

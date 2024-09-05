@@ -83,7 +83,7 @@ const DefaultPalette = (mode: Palette['mode']): Palette => {
       secondary: `rgba(47, 43, 61, 0.68)`,
       disabled: `rgba(47, 43, 61, 0.42)`
     },
-    divider: `rgba(208, 212, 241, 0.16)`,
+    divider: `rgba(47, 43, 61, 0.16)`,
     background: {
       paper: '#c0c0c6-',
       default: defaultBgColor()

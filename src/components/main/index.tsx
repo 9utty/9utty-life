@@ -3,13 +3,11 @@
 import { Box, Typography } from '@mui/material'
 import React from 'react'
 import { MainMenu, MainMenus } from 'src/types'
-import {
-  MaterialReactTable,
-  MRT_ColumnDef,
-  MRT_Row
-} from 'material-react-table'
+import { MRT_ColumnDef, MRT_Row } from 'material-react-table'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
+import Link from 'next/link'
+import DataGrid from 'src/common/dataGrid'
 
 type Props = {
   mainMenus: MainMenus
@@ -41,19 +39,26 @@ export default function BlogMainMenusComponent({ mainMenus }: Props) {
           if (!img) return null
 
           return (
-            <Box
-              sx={{ display: 'flex', gap: 2, height: 40, alignItems: 'center' }}
-            >
-              <Image
-                src={img}
-                alt={`${row.index}번째 이미지`}
-                width={35}
-                height={35}
-              />
-              <Typography variant='h6' color='#000'>
-                {row.original.name}
-              </Typography>
-            </Box>
+            <Link href={`${router.asPath}/main/${row.original.id}`}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  gap: 2,
+                  height: 40,
+                  alignItems: 'center'
+                }}
+              >
+                <Image
+                  src={img}
+                  alt={`${row.index}번째 이미지`}
+                  width={35}
+                  height={35}
+                />
+                <Typography variant='h6' color='#000'>
+                  {row.original.name}
+                </Typography>
+              </Box>
+            </Link>
           )
         }
       },
@@ -69,67 +74,25 @@ export default function BlogMainMenusComponent({ mainMenus }: Props) {
           const createdAt = new Date(row.original.createdAt)
 
           return (
-            <Typography variant='h6' color='#000'>
-              {createdAt.toLocaleString('ko-KR', {
-                month: '2-digit',
-                day: '2-digit',
-                year: 'numeric'
-              })}
-            </Typography>
+            <Link href={`${router.asPath}/main/${row.original.id}`}>
+              <Typography variant='h6' color='#000'>
+                {createdAt.toLocaleString('ko-KR', {
+                  month: '2-digit',
+                  day: '2-digit',
+                  year: 'numeric'
+                })}
+              </Typography>
+            </Link>
           )
         }
       }
     ],
-    []
+    [router.asPath]
   )
-
-  React.useEffect(() => {
-    router.prefetch(`${router.pathname}/main/#/${mainMenus[0].id}`)
-    router.prefetch(`${router.pathname}/main/#/${mainMenus[1].id}`)
-    router.prefetch(`${router.pathname}/main/#/${mainMenus[2].id}`)
-    router.prefetch(`${router.pathname}/main/#/${mainMenus[3].id}`)
-  }, [router, mainMenus])
 
   return (
     <React.Fragment>
-      <MaterialReactTable
-        columns={col}
-        data={mainMenus}
-        enableBottomToolbar={false}
-        enableTopToolbar={false}
-        enableColumnActions={false}
-        muiTableHeadCellProps={{
-          sx: {
-            border: '1px solid rgba(81, 81, 81, 0.5)',
-            bgcolor: '#b0b0b0'
-          }
-        }}
-        muiTableBodyCellProps={{
-          sx: {
-            border: '1px solid rgba(81, 81, 81, 0.5)',
-            paddingBottom: '0px !important',
-            paddingTop: '0px !important',
-            bgcolor: '#d0d0d0'
-          }
-        }}
-        muiTableContainerProps={{
-          sx: {
-            border: '1px solid rgba(81, 81, 81, 0.5)',
-            bgcolor: '#b0b0b0'
-          }
-        }}
-        muiTableBodyRowProps={({ row }) => ({
-          onClick: () => {
-            router.push(
-              `${router.pathname}/main/${row.original.id}`,
-              undefined,
-              {
-                shallow: true
-              }
-            )
-          }
-        })}
-      />
+      <DataGrid<MainMenu> col={col} row={mainMenus} />
     </React.Fragment>
   )
 }
