@@ -9,6 +9,7 @@ import { DialogType } from 'src/types/enums/dialogEnum'
 import { useFormContext } from 'react-hook-form'
 import { DialogFormDefaultValuesType } from 'src/pages/_app'
 import { DraggableData, DraggableEvent } from 'react-draggable'
+import { useMediaQuery } from '@mui/material'
 
 const randomPosition = () => {
   return `${Math.floor(Math.random() * 256) + 234}px`
@@ -36,6 +37,7 @@ export default function useDialogHandle({ form, items }: Props): DialogHandle {
     useFormContext<DialogFormDefaultValuesType>()
   const { setValue, watch } = form
   const router = useRouter()
+  const isMobile = useMediaQuery('(max-width: 500px)')
   const openCount = dialogWatch('openCount')
   const dialogType = dialogWatch('type')
   const open = watch('open')
@@ -45,10 +47,15 @@ export default function useDialogHandle({ form, items }: Props): DialogHandle {
   const handleOpen = React.useCallback(() => {
     setValue('open', true)
     const data = localStorage.getItem(`${DialogType.POST}`)
-    let newPosition = {
-      top: randomPosition(),
-      left: randomPosition()
-    }
+    let newPosition = isMobile
+      ? {
+          top: '10px',
+          left: '10px'
+        }
+      : {
+          top: randomPosition(),
+          left: randomPosition()
+        }
     if (data) {
       newPosition = JSON.parse(data).position
       const size = JSON.parse(data).size
@@ -63,20 +70,20 @@ export default function useDialogHandle({ form, items }: Props): DialogHandle {
             position: newPosition,
             open: true,
             size: {
-              width: 850,
-              height: 650
+              width: isMobile ? 400 : 850,
+              height: isMobile ? 650 : 650
             }
           })
         )
       }
       setValue('size', {
-        width: 850,
-        height: 650
+        width: isMobile ? 400 : 850,
+        height: isMobile ? 650 : 650
       })
     }
     dialogSetValue('type', DialogType.POST)
     dialogSetValue('openCount', openCount + 1)
-  }, [setValue, openCount, dialogSetValue])
+  }, [setValue, isMobile, dialogSetValue, openCount])
 
   const handleFocus = React.useCallback(() => {
     if (dialogType !== DialogType.POST) {

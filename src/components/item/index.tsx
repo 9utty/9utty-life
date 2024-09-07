@@ -1,6 +1,13 @@
 /** @format */
 import 'highlight.js/styles/github-dark.css'
-import { Box, CardContent, Divider, Grid, Typography } from '@mui/material'
+import {
+  Box,
+  CardContent,
+  Divider,
+  Grid,
+  Typography,
+  useMediaQuery
+} from '@mui/material'
 import { MDXRemote } from 'next-mdx-remote'
 import React from 'react'
 import { PostByItemId } from 'src/types'
@@ -12,6 +19,7 @@ type Props = {
 }
 
 export default function ItemComponent({ item }: Props) {
+  const isMobile = useMediaQuery('(max-width: 500px)')
   const createdAt = new Date(item.item.createdAt)
   const formattedDate = createdAt.toLocaleDateString('ko-KR', {
     year: 'numeric',
@@ -26,7 +34,8 @@ export default function ItemComponent({ item }: Props) {
         flexDirection: 'column',
         gap: 2,
         px: 5,
-        color: '#000'
+        color: '#000',
+        paddingX: isMobile ? 2 : 10
       }}
     >
       <Grid container spacing={8}>
@@ -42,10 +51,10 @@ export default function ItemComponent({ item }: Props) {
             <Image
               src={'/post.png'}
               alt={item.item.title}
-              width={80}
-              height={80}
+              width={isMobile ? 40 : 80}
+              height={isMobile ? 40 : 80}
             />
-            <Typography variant='h3' color='#000'>
+            <Typography variant={isMobile ? 'h5' : 'h3'} color='#000'>
               {item.item.title}
             </Typography>
           </Box>
@@ -59,7 +68,7 @@ export default function ItemComponent({ item }: Props) {
               justifyContent: 'space-between'
             }}
           >
-            <Typography variant='h5' color='#000'>
+            <Typography variant={isMobile ? 'body1' : 'h5'} color='#000'>
               {`tag: [${item.item.tag.toString()}]`}
             </Typography>
             <Box
@@ -71,17 +80,22 @@ export default function ItemComponent({ item }: Props) {
                 flexDirection: 'column'
               }}
             >
-              <Typography variant='h5' color='#000'>
+              <Typography variant={isMobile ? 'body1' : 'h5'} color='#000'>
                 {`${item.item.viewCount} views`}
               </Typography>
-              <Typography variant='h5' color='#000'>
+              <Typography variant={isMobile ? 'body1' : 'h5'} color='#000'>
                 {`업데이트: ${formattedDate}`}
               </Typography>
             </Box>
           </Box>
         </Grid>
         <Grid item xs={12}>
-          <Divider sx={{ borderColor: '#000', borderWidth: '1.5px' }} />
+          <Divider
+            sx={{
+              borderColor: '#000',
+              borderWidth: isMobile ? '1px' : '1.5px'
+            }}
+          />
         </Grid>
         <Grid item xs={12}>
           <article>
@@ -89,7 +103,12 @@ export default function ItemComponent({ item }: Props) {
           </article>
         </Grid>
         <Grid item xs={12}>
-          <Divider sx={{ borderColor: '#000', borderWidth: '1.5px' }} />
+          <Divider
+            sx={{
+              borderColor: '#000',
+              borderWidth: isMobile ? '0.5px' : '1.5px'
+            }}
+          />
         </Grid>
         <Grid item xs={12}>
           <Typography variant='h6' color='#000'>
@@ -100,7 +119,12 @@ export default function ItemComponent({ item }: Props) {
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <Divider sx={{ borderColor: '#000', borderWidth: '1.5px' }} />
+          <Divider
+            sx={{
+              borderColor: '#000',
+              borderWidth: isMobile ? '0.5px' : '1.5px'
+            }}
+          />
         </Grid>
         <Grid item xs={12}>
           <Utterances />

@@ -8,7 +8,7 @@ import { DialogType } from 'src/types/enums/dialogEnum'
 import { DraggableData, DraggableEvent } from 'react-draggable'
 
 const randomPosition = () => {
-  return `${Math.floor(Math.random() * 300) + 150}px`
+  return `${Math.floor(Math.random() * 320) + 234}px`
 }
 export type WindowDialogHandle = {
   handleClose: () => void

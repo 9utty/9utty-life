@@ -7,7 +7,8 @@ import {
   Dialog,
   DialogTitle,
   styled,
-  Typography
+  Typography,
+  useMediaQuery
 } from '@mui/material'
 import Draggable from 'react-draggable'
 import {
@@ -163,6 +164,7 @@ export default function PostComponent({
   const form = useDialogForm()
   const { control, watch } = form
   const handle = useDialogHandle({ form, items: summaryItems })
+  const isMobile = useMediaQuery('(max-width: 500px)')
 
   const open = useWatch({ control, name: 'open' })
   const position = useWatch({ control, name: 'position' })
@@ -342,7 +344,9 @@ export default function PostComponent({
                         }}
                         onClick={() => handle.handleSearch(field.value)}
                       >
-                        검색
+                        <Typography variant={isMobile ? 'body2' : 'body1'}>
+                          검색
+                        </Typography>
                       </StyledButton>
                     </React.Fragment>
                   )}
@@ -394,7 +398,7 @@ export async function getServerSideProps(context: NextPageContext) {
   }
   context.res!.setHeader(
     'Cache-Control',
-    'public, s-maxage=10, stale-while-revalidate=59'
+    'public, s-maxage=600, stale-while-revalidate=300'
   )
 
   const revalidateData = 1200
@@ -457,6 +461,7 @@ export async function getServerSideProps(context: NextPageContext) {
             }
           }
         }
+
         break
       case 4:
         if (
