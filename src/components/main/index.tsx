@@ -17,7 +17,8 @@ const imgList: Record<string, string> = {
   Network: '/main1.png',
   '42서울': '/main2.png',
   Project: '/main3.png',
-  Frontend: '/main4.png'
+  Frontend: '/main4.png',
+  개발자일상: '/blog-favicon.png'
 }
 
 export default function BlogMainMenusComponent({ mainMenus }: Props) {
