@@ -115,6 +115,15 @@ a {
   padding: 0 3px 3px 3px;
 }
 
+p code {
+  font-family: 'dunggeunmo-bold';
+  color: #ffa500; /* 주황색 글씨 */
+  background-color: #2f2f2f;
+  margin-left: 2px;
+  margin-right: 2px;
+  border-radius: 5px;
+}
+
 article ol {
   font-family: 'dunggeunmo-bold';
   font-size: 2rem;
