@@ -13,6 +13,7 @@ import React from 'react'
 import { PostByItemId } from 'src/types'
 import Utterances from '../utterances/utterances'
 import Image from 'next/image'
+import Head from 'next/head'
 
 type Props = {
   item: PostByItemId
@@ -38,6 +39,19 @@ export default function ItemComponent({ item }: Props) {
         paddingX: isMobile ? 2 : 10
       }}
     >
+      <Head>
+        <meta name='title' content={item.item.title} />
+        <meta
+          name='description'
+          content={item.compiledSource.compiledSource.toString()}
+        />
+        <meta name='og:title' content={item.item.title} />
+        <meta
+          name='og:description'
+          content={item.compiledSource.compiledSource.toString()}
+        />
+        <meta name='og:image' content='/favicon.png' />
+      </Head>
       <Grid container spacing={8}>
         <Grid item xs={12}>
           <Box
