@@ -398,7 +398,7 @@ export async function getServerSideProps(context: NextPageContext) {
   }
   context.res!.setHeader(
     'Cache-Control',
-    'public, s-maxage=600, stale-while-revalidate=300'
+    'public, s-maxage=600, stale-while-revalidate=30'
   )
 
   const revalidateData = 1200
