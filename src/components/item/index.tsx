@@ -33,6 +33,7 @@ export default function ItemComponent({ item }: Props) {
       sx={{
         display: 'flex',
         flexDirection: 'column',
+        width: '100%',
         gap: 2,
         px: 5,
         color: '#000',

@@ -139,8 +139,9 @@ const StyledSearchInput = styled('input')`
 
 const StyledCardBox = styled(Box)`
   display: flex;
-  width: 100%;
+  flex-wrap: wrap;
   height: 100%;
+  max-width: 100%;
   overflow-y: scroll;
   background-color: fff;
   border: 3px solid #808080;
@@ -363,10 +364,11 @@ export default function PostComponent({
                 alignItems: 'center',
                 justifyContent: 'center',
                 width: '100%',
-                height: size.height - 110 - 45 - 5
+                height: size.height - 110 - 45 - 5,
+                position: 'relative'
               }}
             >
-              <StyledCardBox>
+              <StyledCardBox id='post-content'>
                 <FormProvider {...form}>
                   {type === 'mainMenus' && (
                     <BlogMainMenusComponent mainMenus={mainMenus} />
