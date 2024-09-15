@@ -50,7 +50,7 @@ export default function ItemComponent({ item }: Props) {
           name='og:description'
           content={item.compiledSource.compiledSource.toString()}
         />
-        <meta name='og:image' content='/favicon.png' />
+        <meta name='og:url' content={window.location.href} />
       </Head>
       <Grid container spacing={8}>
         <Grid item xs={12}>
