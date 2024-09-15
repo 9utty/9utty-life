@@ -34,6 +34,7 @@ export default function BlogMainMenusComponent({ mainMenus }: Props) {
             이름
           </Typography>
         ),
+        size: 250,
         Cell: ({ row }: { row: MRT_Row<MainMenu> }) => {
           const img = imgList[row.original.name]
 
@@ -55,7 +56,7 @@ export default function BlogMainMenusComponent({ mainMenus }: Props) {
                   width={35}
                   height={35}
                 />
-                <Typography variant='h6' color='#000'>
+                <Typography variant='h6' color='#000' noWrap>
                   {row.original.name}
                 </Typography>
               </Box>

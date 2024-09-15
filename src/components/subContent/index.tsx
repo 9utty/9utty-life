@@ -26,6 +26,7 @@ export default function SubContentComponent({ subMenuContent }: Props) {
             이름
           </Typography>
         ),
+        size: 250,
         Cell: ({ row }: { row: MRT_Row<Item> }) => {
           return (
             <Link href={`${router.asPath}/item/${row.original.id}`}>
@@ -43,7 +44,7 @@ export default function SubContentComponent({ subMenuContent }: Props) {
                   width={35}
                   height={35}
                 />
-                <Typography variant='h6' color='#000'>
+                <Typography variant='h6' color='#000' noWrap>
                   {row.original.title}
                 </Typography>
               </Box>
