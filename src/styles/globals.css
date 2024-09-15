@@ -184,6 +184,7 @@ article ul li ul li ul li {
 
 article pre code {
   border-radius: 10px;
+  tab-size: 2;
 }
 
 article h1 {
