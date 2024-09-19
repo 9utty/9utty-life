@@ -30,6 +30,7 @@ import Image from 'next/image'
 import { DialogFormDefaultValuesType } from 'src/pages/_app'
 import { DialogType } from 'src/types/enums/dialogEnum'
 import { useRouter } from 'next/router'
+import Head from 'next/head'
 
 const StyledDialog = styled(Dialog)`
   .MuiPaper-root {
@@ -157,7 +158,8 @@ export default function PostComponent({
   subMenuContent,
   mainMenuContent,
   item,
-  type
+  type,
+  absoluteUrl
 }: PostPageProps) {
   const { watch: dialogWatch } = useFormContext<DialogFormDefaultValuesType>()
   const inputRef = React.useRef<HTMLInputElement>(null)
@@ -194,203 +196,221 @@ export default function PostComponent({
   }, [])
 
   return (
-    <Draggable
-      handle='.MuiDialogTitle-root'
-      ref={draggableRef}
-      onMouseDown={() => {
-        handle.handleFocus()
-      }}
-      onStart={() => handle.handleDragStart()}
-      onStop={handle.handleDragStop}
-    >
-      <StyledDialog
+    <React.Fragment>
+      {item !== undefined && (
+        <Head>
+          <meta name='title' content={item.item.title} />
+          <meta
+            name='description'
+            content={item.compiledSource.compiledSource.toString()}
+          />
+          <meta name='og:url' content={absoluteUrl} />
+          <meta name='og:title' content={item.item.title} />
+          <meta
+            name='og:description'
+            content={item.compiledSource.compiledSource.toString()}
+          />
+          <meta name='og:image' content={'/blog-favicon.png'} />
+        </Head>
+      )}
+      <Draggable
+        handle='.MuiDialogTitle-root'
         ref={draggableRef}
-        open={open}
-        fullScreen={true}
-        maxWidth='lg'
-        id='post-dialog'
-        sx={{
-          position: 'absolute',
-          top: position.top,
-          left: position.left,
-          width: size.width,
-          height: size.height,
-          m: 0,
-          zIndex: dialogType === DialogType.POST ? 1001 : 1000,
-          '.MuiPaper-root': {
-            width: size.width,
-            height: size.height
-          }
+        onMouseDown={() => {
+          handle.handleFocus()
         }}
-        hideBackdrop={true}
-        onClick={() => handle.handleFocus()}
-        onClose={() => handle.handleClose()}
-        tabIndex={1}
+        onStart={() => handle.handleDragStart()}
+        onStop={handle.handleDragStop}
       >
-        <ResizableBox
-          width={size.width}
-          height={size.height}
-          minConstraints={[200, 200]}
-          maxConstraints={[1800, 1000]}
-          onResizeStart={() => handle.handleResizeStart()}
-          onResizeStop={() => handle.handleResizeStop()}
-          onResize={(e, data) => handle.handleResize(data)}
-          style={{
-            marginRight: 5
+        <StyledDialog
+          ref={draggableRef}
+          open={open}
+          fullScreen={true}
+          maxWidth='lg'
+          id='post-dialog'
+          sx={{
+            position: 'absolute',
+            top: position.top,
+            left: position.left,
+            width: size.width,
+            height: size.height,
+            m: 0,
+            zIndex: dialogType === DialogType.POST ? 1001 : 1000,
+            '.MuiPaper-root': {
+              width: size.width,
+              height: size.height
+            }
           }}
+          hideBackdrop={true}
+          onClick={() => handle.handleFocus()}
+          onClose={() => handle.handleClose()}
+          tabIndex={1}
         >
-          <Box
-            sx={{
-              width: '100%',
-              height: '100%',
-              maxHeight: 900,
-              overflowY: 'scroll'
+          <ResizableBox
+            width={size.width}
+            height={size.height}
+            minConstraints={[200, 200]}
+            maxConstraints={[1800, 1000]}
+            onResizeStart={() => handle.handleResizeStart()}
+            onResizeStop={() => handle.handleResizeStop()}
+            onResize={(e, data) => handle.handleResize(data)}
+            style={{
+              marginRight: 5
             }}
           >
-            <StyledDialogTitle
-              sx={{
-                backgroundColor:
-                  dialogType === DialogType.POST ? '#000080' : '#c6c6c6', // Change background color based on zIndex
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                width: size.width - 5
-              }}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <Image
-                  src={'/directory_open_file_mydocs-0.png'}
-                  alt={'포스트'}
-                  width={25}
-                  height={25}
-                  priority={true}
-                />
-                <Typography>게시글 페이지</Typography>
-              </Box>
-              <StyledButton onClick={() => handle.handleClose()}>
-                X
-              </StyledButton>
-            </StyledDialogTitle>
             <Box
               sx={{
-                height: 110,
-                width: size.width - 6,
-                display: 'flex',
-                flexDirection: 'column'
+                width: '100%',
+                height: '100%',
+                maxHeight: 900,
+                overflowY: 'scroll'
               }}
             >
-              <Box
+              <StyledDialogTitle
                 sx={{
-                  height: 70,
+                  backgroundColor:
+                    dialogType === DialogType.POST ? '#000080' : '#c6c6c6', // Change background color based on zIndex
                   display: 'flex',
-                  border: '1px solid #808080',
-                  justifyContent: 'space-between'
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  width: size.width - 5
                 }}
               >
-                <Box sx={{ display: 'flex', minWidth: 160 }}>
-                  <StyledMenuButton
-                    onClick={() => {
-                      if (
-                        typeof window !== 'undefined' &&
-                        window.history.length > 0
-                      ) {
-                        router.back()
-                      }
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <Image
+                    src={'/directory_open_file_mydocs-0.png'}
+                    alt={'포스트'}
+                    width={25}
+                    height={25}
+                    priority={true}
+                  />
+                  <Typography>게시글 페이지</Typography>
+                </Box>
+                <StyledButton onClick={() => handle.handleClose()}>
+                  X
+                </StyledButton>
+              </StyledDialogTitle>
+              <Box
+                sx={{
+                  height: 110,
+                  width: size.width - 6,
+                  display: 'flex',
+                  flexDirection: 'column'
+                }}
+              >
+                <Box
+                  sx={{
+                    height: 70,
+                    display: 'flex',
+                    border: '1px solid #808080',
+                    justifyContent: 'space-between'
+                  }}
+                >
+                  <Box sx={{ display: 'flex', minWidth: 160 }}>
+                    <StyledMenuButton
+                      onClick={() => {
+                        if (
+                          typeof window !== 'undefined' &&
+                          window.history.length > 0
+                        ) {
+                          router.back()
+                        }
+                      }}
+                    >
+                      <Typography>{'< 뒤로'} </Typography>
+                    </StyledMenuButton>
+                  </Box>
+                </Box>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    px: 0.5,
+                    height: 35,
+
+                    border: '1px solid #808080'
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      minWidth: 65,
+                      height: 35,
+                      color: '#000',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
                     }}
                   >
-                    <Typography>{'< 뒤로'} </Typography>
-                  </StyledMenuButton>
+                    검색어
+                  </Typography>
+                  <Controller
+                    control={control}
+                    name='searchText'
+                    render={({ field }) => (
+                      <React.Fragment>
+                        <StyledSearchInput
+                          ref={inputRef}
+                          value={field.value}
+                          onChange={e => field.onChange(e.target.value)}
+                          onClick={() => inputRef.current?.focus()}
+                        />
+
+                        <StyledButton
+                          style={{
+                            width: 70,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                          onClick={() => handle.handleSearch(field.value)}
+                        >
+                          <Typography variant={isMobile ? 'body2' : 'body1'}>
+                            검색
+                          </Typography>
+                        </StyledButton>
+                      </React.Fragment>
+                    )}
+                  />
                 </Box>
               </Box>
               <Box
                 sx={{
                   display: 'flex',
+                  pl: 1,
+                  pr: 1.5,
+                  pt: 1,
+                  pb: 1,
                   alignItems: 'center',
-                  px: 0.5,
-                  height: 35,
-
-                  border: '1px solid #808080'
+                  justifyContent: 'center',
+                  width: '100%',
+                  height: size.height - 110 - 45 - 5,
+                  position: 'relative'
                 }}
               >
-                <Typography
-                  sx={{
-                    minWidth: 65,
-                    height: 35,
-                    color: '#000',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
-                >
-                  검색어
-                </Typography>
-                <Controller
-                  control={control}
-                  name='searchText'
-                  render={({ field }) => (
-                    <React.Fragment>
-                      <StyledSearchInput
-                        ref={inputRef}
-                        value={field.value}
-                        onChange={e => field.onChange(e.target.value)}
-                        onClick={() => inputRef.current?.focus()}
-                      />
-
-                      <StyledButton
-                        style={{
-                          width: 70,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}
-                        onClick={() => handle.handleSearch(field.value)}
-                      >
-                        <Typography variant={isMobile ? 'body2' : 'body1'}>
-                          검색
-                        </Typography>
-                      </StyledButton>
-                    </React.Fragment>
-                  )}
-                />
+                <StyledCardBox id='post-content'>
+                  <FormProvider {...form}>
+                    {type === 'mainMenus' && (
+                      <BlogMainMenusComponent mainMenus={mainMenus} />
+                    )}
+                    {type === 'mainMenuContent' &&
+                      mainMenuContent &&
+                      mainMenuContent.at(0) && (
+                        <MainContentComponent
+                          mainMenuContent={mainMenuContent[0]}
+                        />
+                      )}
+                    {type === 'subMenuContent' && subMenuContent && (
+                      <SubContentComponent subMenuContent={subMenuContent} />
+                    )}
+                    {type === 'item' && item && <ItemComponent item={item} />}
+                  </FormProvider>
+                </StyledCardBox>
               </Box>
             </Box>
-            <Box
-              sx={{
-                display: 'flex',
-                pl: 1,
-                pr: 1.5,
-                pt: 1,
-                pb: 1,
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '100%',
-                height: size.height - 110 - 45 - 5,
-                position: 'relative'
-              }}
-            >
-              <StyledCardBox id='post-content'>
-                <FormProvider {...form}>
-                  {type === 'mainMenus' && (
-                    <BlogMainMenusComponent mainMenus={mainMenus} />
-                  )}
-                  {type === 'mainMenuContent' &&
-                    mainMenuContent &&
-                    mainMenuContent.at(0) && (
-                      <MainContentComponent
-                        mainMenuContent={mainMenuContent[0]}
-                      />
-                    )}
-                  {type === 'subMenuContent' && subMenuContent && (
-                    <SubContentComponent subMenuContent={subMenuContent} />
-                  )}
-                  {type === 'item' && item && <ItemComponent item={item} />}
-                </FormProvider>
-              </StyledCardBox>
-            </Box>
-          </Box>
-        </ResizableBox>
-      </StyledDialog>
-    </Draggable>
+          </ResizableBox>
+        </StyledDialog>
+      </Draggable>
+    </React.Fragment>
   )
 }
 
@@ -409,6 +429,7 @@ export async function getServerSideProps(context: NextPageContext) {
   const { req } = context
   const protocol = req?.headers['x-forwarded-proto'] || 'http'
   const host = req?.headers['host']
+  const absoluteUrl = `${protocol}://${host}${req?.url}`
 
   const baseUrl = `${protocol}://${host}/api`
 
@@ -430,7 +451,8 @@ export async function getServerSideProps(context: NextPageContext) {
         props: {
           summaryItems,
           mainMenus,
-          type: 'mainMenus'
+          type: 'mainMenus',
+          absoluteUrl
         }
       }
     } else {
@@ -454,7 +476,8 @@ export async function getServerSideProps(context: NextPageContext) {
                 summaryItems,
                 mainMenus: [],
                 mainMenuContent,
-                type: 'mainMenuContent'
+                type: 'mainMenuContent',
+                absoluteUrl
               }
             }
           } else {
@@ -483,7 +506,8 @@ export async function getServerSideProps(context: NextPageContext) {
                 summaryItems,
                 mainMenus: [],
                 subMenuContent,
-                type: 'subMenuContent'
+                type: 'subMenuContent',
+                absoluteUrl
               }
             }
           } else {
@@ -508,7 +532,8 @@ export async function getServerSideProps(context: NextPageContext) {
                 summaryItems,
                 mainMenus: [],
                 item,
-                type: 'item'
+                type: 'item',
+                absoluteUrl
               }
             }
           } else {
@@ -538,7 +563,8 @@ export async function getServerSideProps(context: NextPageContext) {
                 summaryItems,
                 mainMenus: [],
                 item,
-                type: 'item'
+                type: 'item',
+                absoluteUrl
               }
             }
           } else {
@@ -563,7 +589,8 @@ export async function getServerSideProps(context: NextPageContext) {
     props: {
       summaryItems,
       mainMenus: [],
-      type: 'mainMenus'
+      type: 'mainMenus',
+      absoluteUrl
     }
   }
 }

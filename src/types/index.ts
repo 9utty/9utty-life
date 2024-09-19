@@ -57,6 +57,7 @@ export type PostByItemId = {
 }
 
 export type PostPageProps = {
+  absoluteUrl: string
   summaryItems: ItemSummary[]
   mainMenus: PostMainGet
   subMenuContent: PostBySubMenuIdWithItems | undefined
